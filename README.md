@@ -14,10 +14,16 @@ It is all open source, but is partly inspired by the ESRI [BetterBusBuffers](htt
 
 #### How to use:
 
-Setting up the network with OSM and OSRM is in **osrm_setup**
+Setting up the network with OSM and OSRM is in **osrm_setup.py** will also need to specify a routing profile (e.g. foot)
 
 Finding bus stops with in a threshold distance is in **nearby_stops.py**
 
 And computing number of unique trips for a list of stops is in **trip_count.py**
 
 A sample of how to run these as a batch is in **run.py**
+
+#### To do:
+
+Allow for running multiple GTFS at the same time
+
+Run as a gravity function instead of a simple distance threshold
