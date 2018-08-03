@@ -1,40 +1,25 @@
 import csv
+import pandas as pd
 
-# function for counting the number of unique trips for a select set of bus stops in a
-# inputs a list of bus IDs, name of gtfs folder, and the date in question
-def trip_count_day(bus_stop_ids, gtfs, day):
+# load the trips table to a pandas dataframe, for specific service day(s)
+def load_trips(gtfs,day):
 
     trips_table = gtfs + "/trips.txt"
+    df_trips_table = pd.read_csv(trips_table)
+    df_trips_table = df_trips_table[df_trips_table['service_id'].isin([1])]
+    return (df_trips_table.trip_id.unique()).tolist()
+
+# load the stop times table
+def load_stop_times(gtfs):
+
     stop_times_table = gtfs + "/stop_times.txt"
-    calender_dates = gtfs + "/calendar_dates.txt"
+    df_stop_times = pd.read_csv(stop_times_table)
+    return df_stop_times
 
-    # get list of all service_ids on specified date
-    service_ids_day = []
-    with open(calender_dates) as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["date"] == day:
-                service_ids_day.append(row["service_id"])
+# counts unique trips for the input set of nearby stops
+def trip_count_day(df_stop_times, bus_stop_ids, trips_list):
 
-    #
-    unique_trips = []
-    with open(stop_times_table, "r") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row['stop_id'] in bus_stop_ids:
-                if row['trip_id'] not in unique_trips:
-                    unique_trips.append(row['trip_id'])
-
-
-    # loop over trips, and see if unique_trip id and service_id_day match
-
-    out_trips = []
-    with open(trips_table, "r") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["trip_id"] in unique_trips:
-                if row["service_id"] in service_ids_day:
-                    out_trips.append(row["trip_id"])
-
-
-    return len(out_trips)
+    df_stop_times = df_stop_times[df_stop_times['stop_id'].isin(bus_stop_ids)]
+    df_stop_times = df_stop_times[df_stop_times['trip_id'].isin(trips_list)]
+    unique_trips = len(df_stop_times.trip_id.unique())
+    return unique_trips
